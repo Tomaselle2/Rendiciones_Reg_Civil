@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using RendicionesRegistroCivil.Data;
+using RendicionesRegistroCivil.Interfaces;
+using RendicionesRegistroCivil.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,8 @@ builder.Services.AddOpenApi();
 //el DbContext indicando que usaremos PostgreSQL (Npgsql)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<ITramite, TramiteService>();
 
 var app = builder.Build();
 
