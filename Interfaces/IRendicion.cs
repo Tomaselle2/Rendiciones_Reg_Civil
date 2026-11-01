@@ -1,0 +1,12 @@
+﻿using RendicionesRegistroCivil.DTO.Rendicion;
+
+namespace RendicionesRegistroCivil.Interfaces
+{
+    public interface IRendicion
+    {
+        Task<RendicionDTO> GetbyId(int id);
+        Task<IEnumerable<RendicionDTO>> GetAll();
+        Task<RendicionDTO> Create(CrearRendicionDTO dto);
+        Task<RendicionDTO> Update(int id, RendicionDTO rendicion);
+    }
+}

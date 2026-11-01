@@ -25,5 +25,43 @@ namespace RendicionesRegistroCivil.Controllers
 
             return Ok(tramites);
         }
+
+        [HttpGet("{id:int}", Name = "GetTramitePorId")]
+        [ProducesResponseType(typeof(TramiteDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<TramiteDTO>> GetById(int id)
+        {
+            var tramite = await _tramiteService.GetById(id);
+
+            if (tramite is null)
+                return NotFound();
+
+            return Ok(tramite);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<TramiteDTO>> Post(
+        [FromBody] TramiteDTO tramiteDTO)
+        {
+            var registrado = await _tramiteService.RegistrarTramite(tramiteDTO);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = registrado.Id },
+                registrado);
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult<TramiteDTO>> Put(
+            int id,
+            [FromBody] TramiteDTO tramiteDTO)
+        {
+            if (id != tramiteDTO.Id)
+                return BadRequest("El ID de la URL no coincide con el del trámite.");
+
+            var editado = await _tramiteService.EditarTramite(tramiteDTO);
+
+            return Ok(editado);
+        }
     }
 }

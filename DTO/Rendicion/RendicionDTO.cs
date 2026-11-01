@@ -1,4 +1,6 @@
-﻿using RendicionesRegistroCivil.Models;
+﻿using RendicionesRegistroCivil.DTO.Archivo;
+using RendicionesRegistroCivil.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace RendicionesRegistroCivil.DTO.Rendicion
 {
@@ -11,6 +13,10 @@ namespace RendicionesRegistroCivil.DTO.Rendicion
         public DateOnly PeriodoFin { get; set; }
 
         public DateTime FechaCreacion { get; set; }
+
+        public IEnumerable<DetalleRendicionDTO> DetalleRendicion { get; set; } = new List<DetalleRendicionDTO>();
+
+        public ArchivoRendicionDTO Archivo { get; set; } = new ArchivoRendicionDTO();
 
     }
 }
