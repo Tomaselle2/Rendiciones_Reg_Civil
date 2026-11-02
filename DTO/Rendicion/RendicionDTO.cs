@@ -8,6 +8,8 @@ namespace RendicionesRegistroCivil.DTO.Rendicion
     {
         public int Id { get; set; }
 
+        public string Nombre { get; set; } = string.Empty;
+
         public DateOnly PeriodoInicio { get; set; }
 
         public DateOnly PeriodoFin { get; set; }

@@ -71,6 +71,7 @@ namespace RendicionesRegistroCivil.Servicios
             // Crear rendición
             var rendicion = new Rendicione
             {
+                Nombre = dto.Nombre,
                 PeriodoInicio = dto.PeriodoInicio,
                 PeriodoFin = dto.PeriodoFin,
                 DetalleRendicions = new List<DetalleRendicion>()
@@ -93,7 +94,7 @@ namespace RendicionesRegistroCivil.Servicios
 
             // --- Archivo ---
             var extension = Path.GetExtension(dto.Archivo.FileName).ToLowerInvariant();
-            var nombreAlmacenado = $"{Guid.NewGuid():N}{extension}";
+            var nombreAlmacenado = $"{dto.Nombre.Trim()}_{Guid.NewGuid():N}{extension}";
             var rutaRelativa = Path.Combine("rendiciones",
                 dto.PeriodoInicio.Year.ToString(), nombreAlmacenado);
             var rutaAbsoluta = Path.Combine(_storageRoot, rutaRelativa); // _storageRoot viene de config
@@ -143,6 +144,7 @@ namespace RendicionesRegistroCivil.Servicios
                 .Select(r => new RendicionDTO
                 {
                     Id = r.Id,
+                    Nombre = r.Nombre,
                     PeriodoInicio = r.PeriodoInicio,
                     PeriodoFin = r.PeriodoFin,
                     FechaCreacion = r.FechaCreacion,
@@ -173,6 +175,7 @@ namespace RendicionesRegistroCivil.Servicios
                 .AsNoTracking().Select(r => new RendicionDTO
                 {
                     Id = r.Id,
+                    Nombre = r.Nombre,
                     PeriodoInicio = r.PeriodoInicio,
                     PeriodoFin = r.PeriodoFin,
                     DetalleRendicion = r.DetalleRendicions.Select(d => new DetalleRendicionDTO

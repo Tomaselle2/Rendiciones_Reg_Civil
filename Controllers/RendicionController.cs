@@ -47,5 +47,18 @@ namespace RendicionesRegistroCivil.Controllers
 
             return Ok(rendicion);
         }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<RendicionDTO>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<RendicionDTO>>> GetAll(
+             [FromQuery] int anio)
+        {
+            if (anio < 2000 || anio > DateTime.Now.Year)
+                return BadRequest("El año ingresado no es válido.");
+
+            var rendiciones = await _rendicionService.GetAll(anio);
+
+            return Ok(rendiciones);
+        }
     }
 }

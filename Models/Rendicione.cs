@@ -7,6 +7,8 @@ public partial class Rendicione
 {
     public int Id { get; set; }
 
+    public string Nombre { get; set; } = null!;
+
     public DateOnly PeriodoInicio { get; set; }
 
     public DateOnly PeriodoFin { get; set; }

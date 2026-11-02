@@ -4,6 +4,9 @@ namespace RendicionesRegistroCivil.DTO.Rendicion
 {
     public class CrearRendicionDTO
     {
+        [Required(ErrorMessage = "El nombre de la rendición es requerido.")]
+        public string Nombre { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "La fecha de inicio es requerida.")]
         public DateOnly PeriodoInicio { get; set; }
 

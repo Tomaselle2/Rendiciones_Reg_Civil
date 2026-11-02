@@ -110,6 +110,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.FechaCreacion)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnName("fecha_creacion");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(150)
+                .HasColumnName("nombre");
             entity.Property(e => e.PeriodoFin).HasColumnName("periodo_fin");
             entity.Property(e => e.PeriodoInicio).HasColumnName("periodo_inicio");
         });
