@@ -60,5 +60,20 @@ namespace RendicionesRegistroCivil.Controllers
 
             return Ok(rendiciones);
         }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(RendicionDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<RendicionDTO>> Update(
+            int id,
+            [FromBody] RendicionDTO rendicion)
+        {
+            var resultado = await _rendicionService.Update(id, rendicion);
+
+            if (resultado == null)
+                return NotFound("No se encontró la rendición.");
+
+            return Ok(resultado);
+        }
     }
 }

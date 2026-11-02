@@ -211,9 +211,81 @@ namespace RendicionesRegistroCivil.Servicios
             }
         }
 
-        public Task<RendicionDTO> Update(int id, RendicionDTO rendicion)
+        public async Task<RendicionDTO?> Update(int id, RendicionDTO dto)
         {
-            throw new NotImplementedException();
+            var rendicion = await _context.Rendiciones
+                .Include(r => r.DetalleRendicions)
+                .Include(r => r.ArchivosRendicione)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (rendicion == null)
+                return null;
+
+            ValidarPeriodo(dto.PeriodoInicio, dto.PeriodoFin);
+
+            // Actualizar datos principales
+            rendicion.Nombre = dto.Nombre;
+            rendicion.PeriodoInicio = dto.PeriodoInicio;
+            rendicion.PeriodoFin = dto.PeriodoFin;
+
+            // Materializar los detalles recibidos
+            var detallesDTO = dto.DetalleRendicion.ToList();
+
+            // Validar que no se repitan trámites
+            if (detallesDTO.Select(d => d.TramiteId).Distinct().Count()
+                != detallesDTO.Count)
+            {
+                throw new ArgumentException(
+                    "No se puede repetir un trámite en una rendición.");
+            }
+
+            var detallesActuales = rendicion.DetalleRendicions.ToList();
+
+            // Actualizar o agregar detalles
+            foreach (var detalleDTO in detallesDTO)
+            {
+                if (detalleDTO.Id == 0)
+                {
+                    rendicion.DetalleRendicions.Add(new DetalleRendicion
+                    {
+                        TramiteId = detalleDTO.TramiteId,
+                        Cantidad = detalleDTO.Cantidad,
+                        PrecioUnitario = detalleDTO.PrecioUnitario
+                    });
+
+                    continue;
+                }
+
+                var detalleExistente = detallesActuales
+                    .FirstOrDefault(d => d.Id == detalleDTO.Id);
+
+                if (detalleExistente == null)
+                {
+                    throw new ArgumentException(
+                        $"El detalle {detalleDTO.Id} no pertenece a esta rendición.");
+                }
+
+                detalleExistente.TramiteId = detalleDTO.TramiteId;
+                detalleExistente.Cantidad = detalleDTO.Cantidad;
+                detalleExistente.PrecioUnitario = detalleDTO.PrecioUnitario;
+            }
+
+            // Eliminar detalles que ya no vienen en el DTO
+            var idsRecibidos = detallesDTO
+                .Where(d => d.Id != 0)
+                .Select(d => d.Id)
+                .ToHashSet();
+
+            var detallesEliminar = detallesActuales
+                .Where(d => !idsRecibidos.Contains(d.Id))
+                .ToList();
+
+            _context.DetalleRendicions.RemoveRange(detallesEliminar);
+
+            await _context.SaveChangesAsync();
+
+            // Retornar la rendición actualizada
+            return await GetbyId(id);
         }
 
         private static void ValidarPeriodo(
