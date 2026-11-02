@@ -133,9 +133,35 @@ namespace RendicionesRegistroCivil.Servicios
             return await GetbyId(rendicion.Id);
         }
 
-        public Task<IEnumerable<RendicionDTO>> GetAll()
+        public async Task<IEnumerable<RendicionDTO>> GetAll(int anio)
         {
-            throw new NotImplementedException();
+            var rendiciones = await _context.Rendiciones
+                .AsNoTracking()
+                .Where(r => r.PeriodoInicio.Year == anio)
+                .Include(r => r.ArchivosRendicione)
+                .OrderBy(r => r.PeriodoInicio)
+                .Select(r => new RendicionDTO
+                {
+                    Id = r.Id,
+                    PeriodoInicio = r.PeriodoInicio,
+                    PeriodoFin = r.PeriodoFin,
+                    FechaCreacion = r.FechaCreacion,
+
+                    Archivo = r.ArchivosRendicione != null ? new ArchivoRendicionDTO
+                    {
+                        Id = r.ArchivosRendicione.Id,
+                        RendicionId = r.ArchivosRendicione.RendicionId,
+                        NombreOriginal = r.ArchivosRendicione.NombreOriginal,
+                        NombreAlmacenado = r.ArchivosRendicione.NombreAlmacenado,
+                        RutaRelativa = r.ArchivosRendicione.RutaRelativa,
+                        TipoMime = r.ArchivosRendicione.TipoMime,
+                        TamanoBytes = r.ArchivosRendicione.TamanoBytes,
+                        FechaCarga = r.ArchivosRendicione.FechaCarga
+                    } : new ArchivoRendicionDTO()
+                })
+                .ToListAsync();
+
+            return rendiciones;
         }
 
         public async Task<RendicionDTO> GetbyId(int id)
@@ -172,8 +198,14 @@ namespace RendicionesRegistroCivil.Servicios
                 })
                 .FirstOrDefaultAsync(r => r.Id == id);
 
-            return rendicion ?? throw new KeyNotFoundException(
-                $"No se encontró la rendición con ID {id}.");
+            if (rendicion is null)
+            {
+                return null;
+            }
+            else
+            {
+                return rendicion;
+            }
         }
 
         public Task<RendicionDTO> Update(int id, RendicionDTO rendicion)

@@ -20,13 +20,14 @@ namespace RendicionesRegistroCivil.Controllers
         [HttpPost]
         [Consumes("multipart/form-data")]
         [RequestSizeLimit(21 * 1024 * 1024)]
+        [ProducesResponseType(typeof(RendicionDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
         public async Task<ActionResult<RendicionDTO>> Create([FromForm] CrearRendicionDTO dto)
         {
-            // Aquí iría la lógica para crear la rendición utilizando el servicio correspondiente
-            // Por ejemplo:
-            // var rendicionCreada = await _rendicionService.Create(dto);
-            // return CreatedAtAction(nameof(GetById), new { id = rendicionCreada.Id }, rendicionCreada);
-            return Ok(); // Placeholder response
+            var rendicion = await _rendicionService.Create(dto);
+
+            return CreatedAtRoute("GetRendicionPorId", new { id = rendicion.Id }, rendicion);
         }
 
         [HttpGet("{id:int}", Name = "GetRendicionPorId")]
@@ -36,8 +37,13 @@ namespace RendicionesRegistroCivil.Controllers
         {
             var rendicion = await _rendicionService.GetbyId(id);
 
-            if(rendicion is null)
-                return NotFound();
+            if (rendicion is null)
+                return NotFound(new ProblemDetails
+                {
+                    Status = StatusCodes.Status404NotFound,
+                    Title = "Rendición no encontrada",
+                    Detail = $"No se encontró la rendición con ID {id}."
+                });
 
             return Ok(rendicion);
         }

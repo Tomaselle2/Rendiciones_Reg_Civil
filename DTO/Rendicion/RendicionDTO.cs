@@ -16,7 +16,7 @@ namespace RendicionesRegistroCivil.DTO.Rendicion
 
         public IEnumerable<DetalleRendicionDTO> DetalleRendicion { get; set; } = new List<DetalleRendicionDTO>();
 
-        public ArchivoRendicionDTO Archivo { get; set; } = new ArchivoRendicionDTO();
+        public ArchivoRendicionDTO? Archivo { get; set; }
 
     }
 }

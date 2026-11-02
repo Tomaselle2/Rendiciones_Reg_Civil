@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using RendicionesRegistroCivil.Data;
 using RendicionesRegistroCivil.Interfaces;
 using RendicionesRegistroCivil.Servicios;
+using RendicionesRegistroCivil.Utils.Middleware;
 using RendicionesRegistroCivil.Utils.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,9 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddScoped<ITramite, TramiteService>();
 builder.Services.AddScoped<IRendicion, RendicionService>();
 
@@ -28,6 +32,7 @@ builder.Services
     .ValidateOnStart();
 
 var app = builder.Build();
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
